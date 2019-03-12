@@ -1,0 +1,34 @@
+//隐藏位置 title栏
+.slide-down-enter, .slide-down-leave-to {
+  transform: translate3d(0, -100%, 0);
+}
+
+//隐藏位置 menu栏 setting栏
+.slide-up-enter, .slide-up-leave-to {
+  transform: translate3d(0, px2rem(138), 0)
+}
+
+//显示位置 title栏 menu栏 setting栏
+.slide-down-enter-to, .slide-down-leave,
+.slide-up-enter-to, .slide-up-leave {
+  transform: translate3d(0, 0, 0)
+}
+
+//过渡 title栏 menu栏 setting栏 字体弹出框
+.slide-down-enter-active, .slide-down-leave-active,
+.slide-up-enter-active, .slide-up-leave-active,
+.popup-slide-up-enter-active, .popup-slide-up-leave-active{
+  transition: all .2s linear
+}
+
+//隐藏位置 字体弹出框
+.popup-slide-up-enter, .popup-slide-up-leave-to {
+  transform: translate3d(0, 100%, 0);
+  opacity: 0;
+}
+
+//结束位置 字体弹出框
+.popup-slide-up-enter-to, .popup-slide-up-leave {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}

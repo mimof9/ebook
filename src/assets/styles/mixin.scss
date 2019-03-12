@@ -1,0 +1,29 @@
+$ratio: 375 / 10;
+
+@function px2rem($px) {
+  @return $px / $ratio + rem; //这里 + rem 不能写成 + 'rem' 不然返回的是字符串不是单位
+}
+
+@mixin center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin left {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+@mixin right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+@mixin ellipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

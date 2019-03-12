@@ -1,20 +1,15 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import book from './modules/book'
+import getters from './getters'
+import actions from './actions'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
-  state: {
-    test: 1
+  modules: {
+    book
   },
-  mutations: {
-    'SET_TEST': (state, newTest) => {
-      state.test = newTest
-    }
-  },
-  actions: {
-    setTest: ({ commit, state }, newTest) => {
-      return commit('SET_TEST', newTest)
-    }
-  }
+  getters,
+  actions
 })

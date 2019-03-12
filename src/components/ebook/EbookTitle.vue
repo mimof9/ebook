@@ -20,13 +20,10 @@
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
+  import { ebookMixin } from '../../utils/mixin'
+
   export default {
-    computed: {
-      ...mapGetters([
-        'menuVisible'
-      ])
-    },
+    mixins: [ebookMixin],
     methods: {
       back() {
         console.log('back')
@@ -35,8 +32,8 @@
   }
 </script>
 
-<style lang="scss" rel="stylesheet/scss" scoped>
-  @import "../../assets/styles/global";
+<style lang='scss' rel="stylesheet/scss" scoped>
+  @import '../../assets/styles/global';
   .title-wrapper {
     position: absolute;
     top: 0;
@@ -46,12 +43,11 @@
     height: px2rem(48);
     background: white;
     font-size: px2rem(20);
-    /*box-shadow: 0 px2rem(8) px2rem(8) rgba(0, 0, 0, .15);*/ /*使用px2rem函数指定阴影没有效果*/
-    box-shadow: 0 0.1rem 0.1rem rgba(0, 0, 0, .15);
+    box-shadow: 0 px2rem(8) px2rem(8) rgba(0, 0, 0, .15);
     display: flex;
     .left {
       flex: 0 0 px2rem(60);
-      @include center;
+      @include left;
     }
     .right {
       flex: 1;
