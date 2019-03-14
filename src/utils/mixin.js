@@ -1,5 +1,5 @@
 import { mapGetters, mapActions } from 'vuex'
-import { themeList, addCss, removeAllCss } from './book'
+import { themeList, addCss, removeAllCss, getReadTimeByMinute } from './book'
 import { saveLocation } from './localStorage'
 // 使用vue的mixin机制混入vuex 实现代码复用
 // mapGetters简化 this.$store.book.xxx的写法为 this.xxx
@@ -17,7 +17,10 @@ export const ebookMixin = {
       'defaultTheme',
       'progress',
       'bookAvailable',
-      'section'
+      'section',
+      'cover',
+      'metadata',
+      'navigation'
     ]),
     themeList() {
       return themeList(this)
@@ -35,7 +38,10 @@ export const ebookMixin = {
       'setDefaultTheme',
       'setProgress',
       'setBookAvailable',
-      'setSection'
+      'setSection',
+      'setCover',
+      'setMetadata',
+      'setNavigation'
     ]),
     initGlobalTheme() {
       // addCss('http://localhost:8081/theme/theme_gold.css')
@@ -47,11 +53,13 @@ export const ebookMixin = {
     // 设置vuex中progress 设置章节序号 保存start.cfi
     refreshLocation() {
       const currentLocationInfo = this.currentBook.rendition.currentLocation()
-      const startCfi = currentLocationInfo.start.cfi
-      const progress = this.currentBook.locations.percentageFromCfi(startCfi)
-      this.setProgress(Math.floor(progress * 100))
-      this.setSection(currentLocationInfo.start.index)
-      saveLocation(this.fileName, startCfi)
+      if (currentLocationInfo && currentLocationInfo.start) {
+        const startCfi = currentLocationInfo.start.cfi
+        const progress = this.currentBook.locations.percentageFromCfi(startCfi)
+        this.setProgress(Math.floor(progress * 100))
+        this.setSection(currentLocationInfo.start.index)
+        saveLocation(this.fileName, startCfi)
+      }
     },
     display(target, cb) {
       if (target) {
@@ -65,6 +73,15 @@ export const ebookMixin = {
           if (cb) cb()
         })
       }
+    },
+    hideTitleAndMenu() {
+      // this.$store.dispatch('setMenuVisible', false)
+      this.setMenuVisible(false)
+      this.setSettingVisible(-1) // menu栏隐藏 setting栏要缩回去
+      this.setFontFamilyVisible(false) // 字体弹出兰隐藏
+    },
+    getReadTimeText() {
+      return this.$t('book.haveRead').replace('$1', getReadTimeByMinute(this.fileName))
     }
   }
 }

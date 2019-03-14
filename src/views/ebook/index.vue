@@ -22,7 +22,6 @@
     },
     methods: {
       startLoopReadTime() {
-        console.log(this.fileName)
         let readTime = getReadTime(this.fileName)
         if (!readTime) {
           readTime = 0

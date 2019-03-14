@@ -1,4 +1,6 @@
 // 管理静态变量
+import { getReadTime } from './localStorage'
+
 export const FONT_SIZE_LIST = [
   { fontSize: 12 },
   { fontSize: 14 },
@@ -89,4 +91,19 @@ export function removeAllCss() {
   removeCss('http://localhost:8081/theme/theme_gold.css')
   removeCss('http://localhost:8081/theme/theme_eye.css')
   removeCss('http://localhost:8081/theme/theme_night.css')
+}
+
+export function getReadTimeByMinute(fileName) {
+  let readTime = getReadTime(fileName)
+  if (!readTime) {
+    return 0
+  } else {
+    return Math.ceil(readTime / 60)
+  }
+}
+
+export function flatten(arr) {
+  return [].concat(...arr.map(item => {
+    return [].concat(item, ...flatten(item.subitems))
+  }))
 }

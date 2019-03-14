@@ -13,6 +13,7 @@
     getFontSize, saveFontSize,
     getTheme, saveTheme,
     getLocation } from '../../utils/localStorage'
+  import { flatten } from '../../utils/book'
 
   global.ePub = Epub
   export default {
@@ -102,12 +103,42 @@
           event.stopPropagation()
         })
       },
+      parseBook() {
+        // 解析电子书 获取电子书的一些内容 封面 书名 作者等
+        this.book.loaded.cover.then(cover => {
+          this.book.archive.createUrl(cover).then(url => {
+            this.setCover(url)
+          })
+        })
+        this.book.loaded.metadata.then(metadata => {
+          this.setMetadata(metadata)
+        })
+        this.book.loaded.navigation.then(nav => {
+          const navItem = flatten(nav.toc)
+          // 扁平化之后带来的问题是不清楚目录原来的层级 下面来求目录的层级
+          function findLevel(item, level = 0) {
+            if (!item.parent) {
+              return level // 如果没有parent 返回
+            } else {
+              let parentItem = navItem.filter(parentItem => item.parent === parentItem.id)[0]
+              return findLevel(parentItem, ++level)
+            }
+          }
+          // 给一维目录添加层级属性
+          navItem.forEach(item => {
+            item.level = findLevel(item)
+          })
+          // 添加到vuex
+          this.setNavigation(navItem)
+        })
+      },
       initEpub() {
         const url = 'http://localhost:8081/epub/' + this.fileName + '.epub'
         this.book = new Epub(url)
         this.setCurrentBook(this.book) // 将电子书对象传入vuex 这样就不需要在子组件中调父组件方法了
         this.initRendition()
         this.initGesture()
+        this.parseBook()
         // 电子书加载完毕的钩子函数
         this.book.ready.then(() => {
           // 设置一页显示的字数 屏幕越大字数越多 字体越大字数越少 这个分页算法很粗糙
@@ -140,12 +171,6 @@
         this.setMenuVisible(!this.menuVisible)
         this.setSettingVisible(-1) // menu栏显示，隐藏 setting栏都要缩回去
         this.setFontFamilyVisible(false)
-      },
-      hideTitleAndMenu() {
-        // this.$store.dispatch('setMenuVisible', false)
-        this.setMenuVisible(false)
-        this.setSettingVisible(-1) // menu栏隐藏 setting栏要缩回去
-        this.setFontFamilyVisible(false) // 字体弹出兰隐藏
       }
     }
   }

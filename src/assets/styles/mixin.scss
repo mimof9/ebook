@@ -1,5 +1,7 @@
 $ratio: 375 / 10;
+// 1rem = window.innerWidth / 10 最多50px
 
+// 这里直接 375 / 10的意思 就是整个设计实在标准的375px宽度的屏幕下做的
 @function px2rem($px) {
   @return $px / $ratio + rem; //这里 + rem 不能写成 + 'rem' 不然返回的是字符串不是单位
 }
@@ -22,8 +24,20 @@ $ratio: 375 / 10;
   align-items: center;
 }
 
+// 使用时 容器一定要指定了宽度 不然就会把文字一条铺完
 @mixin ellipsis {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+}
+
+//
+@mixin ellipsis2($line) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $line;
+  white-space: normal;
+  overflow: hidden;
+  text-boxshadown: ellipsis;
+  word-break: keep-all;
 }

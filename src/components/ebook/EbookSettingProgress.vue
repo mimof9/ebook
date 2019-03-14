@@ -35,19 +35,19 @@
 
 <script>
   import { ebookMixin } from '../../utils/mixin'
-  import { getReadTime } from '../../utils/localStorage'
 
   export default {
     mixins: [ebookMixin],
     computed: {
       getSectionName() {
-        if (this.section) {
-          const sectionInfo = this.currentBook.section(this.section)
-          if (sectionInfo && sectionInfo.href) {
-            return this.currentBook.navigation.get(sectionInfo.href).label
-          }
-        }
-        return ''
+        // if (this.section) {
+        //   const sectionInfo = this.currentBook.section(this.section)
+        //   if (sectionInfo && sectionInfo.href) {
+        //     return this.currentBook.navigation.get(sectionInfo.href).label
+        //   }
+        // }
+        // 上面获取的是一级目录 我们已经把多级目录压缩成一维 直接获取就可以了
+        return this.section ? this.navigation[this.section].label : ''
       }
     },
     updated() {
@@ -90,17 +90,6 @@
               this.displaySection()
           })
         }
-      },
-      getReadTimeByMinute() {
-        let readTime = getReadTime(this.fileName)
-        if (!readTime) {
-          return 0
-        } else {
-          return Math.ceil(readTime / 60)
-        }
-      },
-      getReadTimeText() {
-        return this.$t('book.haveRead').replace('$1', this.getReadTimeByMinute())
       }
     }
   }
