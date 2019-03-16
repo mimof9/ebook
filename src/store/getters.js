@@ -12,7 +12,11 @@ const book = {
   section: state => state.book.section,
   cover: state => state.book.cover,
   metadata: state => state.book.metadata,
-  navigation: state => state.book.navigation
+  navigation: state => state.book.navigation,
+  offsetY: state => state.book.offsetY,
+  isBookmark: state => state.book.isBookmark,
+  pagelist: state => state.book.pagelist,
+  paginate: state => state.book.paginate
 }
 
 export default book

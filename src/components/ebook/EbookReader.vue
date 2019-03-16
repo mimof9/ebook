@@ -1,6 +1,13 @@
 <template>
   <div class="ebook-reader">
     <div id="read"></div>
+    <div class="ebook-reader-mask"
+         @click="onMaskClick"
+         @touchmove="move"
+         @touchend="moveEnd"
+         @mousedown.left="onMouseDown"
+         @mousemove.left="onMouseMove"
+         @mouseup.left="onMouseUp"></div>
   </div>
 </template>
 
@@ -25,6 +32,79 @@
       })
     },
     methods: {
+      // PC端适配手势书签
+      // 1 鼠标down
+      // 2 鼠标down+move
+      // 3 鼠标move+up
+      // 4 鼠标down+up
+      onMouseUp(e) {
+        if (this.mousestate === 2) { // 点击鼠标移动后
+          this.mousestate = 3
+          this.firstTouch = 0
+          this.setOffsetY(0)
+        } else { // 点击鼠标没有移动
+          this.mousestate = 4
+        }
+        // 防止点击时轻微的移动造成的点击事件不响应
+        const time = e.timeStamp - this.startClickTime
+        if (time < 100) {
+          this.mousestate = 4
+        }
+        e.preventDefault()
+        e.stopPropagation()
+      },
+      onMouseMove(e) {
+        if (this.mousestate === 1) {
+          this.mousestate = 2
+        } else if (this.mousestate === 2) {
+          let offsetY = this.offsetY
+          if (this.firstTouch) {
+            offsetY = e.clientY - this.firstTouch
+            this.setOffsetY(offsetY)
+          } else {
+            this.firstTouch = e.clientY
+          }
+          e.preventDefault()
+          e.stopPropagation()
+        }
+      },
+      onMouseDown(e) {
+        this.mousestate = 1
+        this.startClickTime = e.timeStamp
+        e.preventDefault()
+        e.stopPropagation()
+      },
+      move(e) {
+        let offsetY = this.offsetY
+        if (this.firstTouch) {
+          offsetY = e.changedTouches[0].clientY - this.firstTouch
+          this.setOffsetY(offsetY)
+        } else {
+          this.firstTouch = e.changedTouches[0].clientY
+        }
+        e.preventDefault() // 阻止默认行为 否者下拉的时候 会看到微信的背板 这里禁止冒泡
+        e.stopPropagation()
+      },
+      moveEnd(e) {
+        this.firstTouch = 0
+        this.setOffsetY(0)
+      },
+      onMaskClick(e) {
+        if (this.mousestate && (this.mousestate === 2 || this.mousestate === 3)) {
+          return
+        }
+        const offsetX = e.offsetX
+        const width = window.innerWidth
+        if (offsetX > 0) {
+          if (offsetX < width * 0.3) {
+            this.prevPage()
+          } else if (offsetX > width * 0.7) {
+            this.nextPage()
+          } else {
+            this.toggleTitleAndMenu()
+          }
+        }
+      },
       initTheme() {
         // 初始化主题
         let defaultTheme = getTheme(this.fileName)
@@ -62,6 +142,7 @@
           width: window.innerWidth,
           height: window.innerHeight,
           method: 'default'
+          // flow: 'scrolled' // 滚动阅读模式 微信不支持
         })
         // 电子书渲染完成后 调用then display是this.rendition.display的封装 添加了进度刷新和保存
         const location = getLocation(this.fileName) // 获取保存的进度
@@ -83,26 +164,26 @@
           })
         })
       },
-      initGesture() {
-        // 监听滑动手势 根据滑动方向和时间
-        this.rendition.on('touchstart', event => {
-          this.touchStartX = event.changedTouches[0].clientX
-          this.touchStartTime = event.timeStamp
-        })
-        this.rendition.on('touchend', event => {
-          const offsetX = event.changedTouches[0].clientX - this.touchStartX
-          const time = event.timeStamp - this.touchStartTime
-          if (time < 500 && offsetX > 40) {
-            this.prevPage()
-          } else if (time < 500 && offsetX < -40) {
-            this.nextPage()
-          } else {
-            this.toggleTitleAndMenu()
-          }
-          event.preventDefault()
-          event.stopPropagation()
-        })
-      },
+      // initGesture() {
+      //   // 监听滑动手势 根据滑动方向和时间
+      //   this.rendition.on('touchstart', event => {
+      //     this.touchStartX = event.changedTouches[0].clientX
+      //     this.touchStartTime = event.timeStamp
+      //   })
+      //   this.rendition.on('touchend', event => {
+      //     const offsetX = event.changedTouches[0].clientX - this.touchStartX
+      //     const time = event.timeStamp - this.touchStartTime
+      //     if (time < 500 && offsetX > 40) {
+      //       this.prevPage()
+      //     } else if (time < 500 && offsetX < -40) {
+      //       this.nextPage()
+      //     } else {
+      //       this.toggleTitleAndMenu()
+      //     }
+      //     event.preventDefault()
+      //     event.stopPropagation()
+      //   })
+      // },
       parseBook() {
         // 解析电子书 获取电子书的一些内容 封面 书名 作者等
         this.book.loaded.cover.then(cover => {
@@ -137,7 +218,7 @@
         this.book = new Epub(url)
         this.setCurrentBook(this.book) // 将电子书对象传入vuex 这样就不需要在子组件中调父组件方法了
         this.initRendition()
-        this.initGesture()
+        // this.initGesture()
         this.parseBook()
         // 电子书加载完毕的钩子函数
         this.book.ready.then(() => {
@@ -146,6 +227,32 @@
             (getFontSize(this.fileName) / 16))
         }).then(locations => {
           console.log(`电子书载入完成...`) // locations保存的是分页后的电子书
+          this.navigation.forEach(nav => {
+            nav.pagelist = []
+          })
+          // 确定每个章节的页数
+          locations.forEach(item => {
+            const loc = item.match(/\[(.*)\]!/)[1]
+            this.navigation.forEach(nav => {
+              if (nav.href) {
+                const href = nav.href.match(/^(.*)\.x?html$/)[1]
+                if (href === loc) {
+                  nav.pagelist.push(item)
+                }
+              }
+            })
+          })
+          // 前缀和求每章的起始页数
+          let presum = 1
+          this.navigation.forEach((nav, index) => {
+            if (index === 0) {
+              nav.page = 1
+            } else {
+              nav.page = presum
+            }
+            presum += nav.pagelist.length + 1
+          })
+          this.setPagelist(locations) // 在vuex中将分页结果保存在下来
           this.setBookAvailable(true)
           this.refreshLocation() // 电子书初次渲染的时候 locations分页还没建好 所以progress===null 进度条0
         })
@@ -176,6 +283,20 @@
   }
 </script>
 
-<style lang="scss" scoped>
-
+<style lang="scss" rel="stylesheet/scss" scoped>
+  @import '../../assets/styles/global';
+  .ebook-reader {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    .ebook-reader-mask {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 150; // 蒙板 提供手势操作
+      width: 100%;
+      height: 100%;
+      background: transparent;
+    }
+  }
 </style>

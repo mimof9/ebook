@@ -1,5 +1,6 @@
 // 管理静态变量
 import { getReadTime } from './localStorage'
+import { realPx } from './utils'
 
 export const FONT_SIZE_LIST = [
   { fontSize: 12 },
@@ -28,7 +29,9 @@ export function themeList(vue) {
       style: {
         body: {
           'color': '#4c5059',
-          'background': '#cecece'
+          'background': '#cecece',
+          'padding-top': `${realPx(48)}px!important`, // 阅读器内边距 epubjs默认是固定的20px不能自适应
+          'padding-bottom': `${realPx(48)}px!important`
         }
       }
     },
@@ -38,7 +41,9 @@ export function themeList(vue) {
       style: {
         body: {
           'color': '#5c5b56',
-          'background': '#c6c2b6'
+          'background': '#c6c2b6',
+          'padding-top': `${realPx(48)}px!important`,
+          'padding-bottom': `${realPx(48)}px!important`
         }
       }
     },
@@ -48,7 +53,9 @@ export function themeList(vue) {
       style: {
         body: {
           'color': '#404c42',
-          'background': '#a9c1a9'
+          'background': '#a9c1a9',
+          'padding-top': `${realPx(48)}px!important`,
+          'padding-bottom': `${realPx(48)}px!important`
         }
       }
     },
@@ -58,7 +65,9 @@ export function themeList(vue) {
       style: {
         body: {
           'color': '#cecece',
-          'background': '#000000'
+          'background': '#000000',
+          'padding-top': `${realPx(48)}px!important`,
+          'padding-bottom': `${realPx(48)}px!important`
         }
       }
     }

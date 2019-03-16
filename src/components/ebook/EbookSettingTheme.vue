@@ -40,7 +40,7 @@
     position: absolute;
     left: 0;
     bottom: px2rem(48);
-    z-index: 101;
+    z-index: 201;
     width: 100%;
     height: px2rem(90);
     background: white;

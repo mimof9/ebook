@@ -1,6 +1,6 @@
 import { mapGetters, mapActions } from 'vuex'
 import { themeList, addCss, removeAllCss, getReadTimeByMinute } from './book'
-import { saveLocation } from './localStorage'
+import { saveLocation, getBookmark } from './localStorage'
 // 使用vue的mixin机制混入vuex 实现代码复用
 // mapGetters简化 this.$store.book.xxx的写法为 this.xxx
 // mapActions简化 this.$store.dispatch('methodName', val)的写法为 this.methodName(val)
@@ -20,10 +20,24 @@ export const ebookMixin = {
       'section',
       'cover',
       'metadata',
-      'navigation'
+      'navigation',
+      'offsetY',
+      'isBookmark',
+      'pagelist',
+      'paginate'
     ]),
     themeList() {
       return themeList(this)
+    },
+    getSectionName() {
+      // if (this.section) {
+      //   const sectionInfo = this.currentBook.section(this.section)
+      //   if (sectionInfo && sectionInfo.href) {
+      //     return this.currentBook.navigation.get(sectionInfo.href).label
+      //   }
+      // }
+      // 上面获取的是一级目录 我们已经把多级目录压缩成一维 直接获取就可以了
+      return this.section ? this.navigation[this.section].label : ''
     }
   },
   methods: {
@@ -41,7 +55,11 @@ export const ebookMixin = {
       'setSection',
       'setCover',
       'setMetadata',
-      'setNavigation'
+      'setNavigation',
+      'setOffsetY',
+      'setIsBookmark',
+      'setPagelist',
+      'setPaginate'
     ]),
     initGlobalTheme() {
       // addCss('http://localhost:8081/theme/theme_gold.css')
@@ -52,13 +70,36 @@ export const ebookMixin = {
     // 读取当前页起始位置start.cfi 通过cfi获取进度
     // 设置vuex中progress 设置章节序号 保存start.cfi
     refreshLocation() {
-      const currentLocationInfo = this.currentBook.rendition.currentLocation()
-      if (currentLocationInfo && currentLocationInfo.start) {
-        const startCfi = currentLocationInfo.start.cfi
+      const currentLocation = this.currentBook.rendition.currentLocation()
+      if (currentLocation && currentLocation.start) {
+        const startCfi = currentLocation.start.cfi
         const progress = this.currentBook.locations.percentageFromCfi(startCfi)
         this.setProgress(Math.floor(progress * 100))
-        this.setSection(currentLocationInfo.start.index)
+        this.setSection(currentLocation.start.index)
         saveLocation(this.fileName, startCfi)
+        // 是否添加书签
+        const bookmark = getBookmark(this.fileName)
+        if (bookmark) {
+          if (bookmark.some(item => item.cfi === startCfi)) {
+            this.setIsBookmark(true)
+          } else {
+            this.setIsBookmark(false)
+          }
+        } else {
+          this.setIsBookmark(false)
+        }
+        // 添加页脚分页
+        if (this.pagelist) {
+          const totalPage = this.pagelist.length
+          const currentPage = currentLocation.start.location
+          if (currentPage && currentPage > 0) {
+            this.setPaginate(currentPage + '/' + totalPage)
+          } else {
+            this.setPaginate('')
+          }
+        } else {
+          this.setPaginate('') // 分页未完成
+        }
       }
     },
     display(target, cb) {

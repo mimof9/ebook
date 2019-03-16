@@ -38,7 +38,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 101;
+    z-index: 200;
     width: 100%;  /*绝对定位后 不再充满父元素 需要手动设置100%*/
     height: px2rem(48);
     background: white;

@@ -41,7 +41,7 @@
            @click="display(item.href, hideTitleAndMenu())">
         <div class="slide-contents-item-label"
              :style="contentItemStyle(item)">{{item.label}}</div>
-        <div class="slide-contents-item-page"></div>
+        <div class="slide-contents-item-page">{{item.page}}</div>
       </div>
     </scroll>
     <scroll class="slide-search-list"
@@ -230,6 +230,9 @@
           @include ellipsis;
         }
         .slide-contents-item-page {
+          flex: 0 0 px2rem(30);
+          font-size: px2rem(10);
+          @include right;
         }
       }
     }

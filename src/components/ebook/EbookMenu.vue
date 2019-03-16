@@ -56,7 +56,7 @@
     position: absolute;
     left: 0;
     bottom: 0;
-    z-index: 102; /*setting栏是101 过度时更自然 但是也需要解决box-shadow问题*/
+    z-index: 202; /*setting栏是201 过度时更自然 但是也需要解决box-shadow问题*/
     width: 100%;
     height: px2rem(48);
     background: white;

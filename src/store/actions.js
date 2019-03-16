@@ -40,6 +40,18 @@ const actions = {
   },
   setNavigation: ({ commit }, navigation) => {
     return commit('SET_NAVIGATION', navigation)
+  },
+  setOffsetY: ({ commit }, offsetY) => {
+    return commit('SET_OFFSETY', offsetY)
+  },
+  setIsBookmark: ({ commit }, isBookmark) => {
+    return commit('SET_ISBOOKMARK', isBookmark)
+  },
+  setPagelist: ({ commit }, pagelist) => {
+    return commit('SET_PAGELIST', pagelist)
+  },
+  setPaginate: ({ commit }, paginate) => {
+    return commit('SET_PAGINATE', paginate)
   }
 }
 

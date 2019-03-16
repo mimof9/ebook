@@ -1,7 +1,7 @@
 const book = {
   state: {
     fileName: '',
-    menuVisible: true,
+    menuVisible: false,
     settingVisible: -1, // 设置栏 -1：不显示 0：字体 1：主题 2：进度 3：目录
     defaultFontSize: 16,
     currentBook: null, // this.book
@@ -13,7 +13,11 @@ const book = {
     section: 0, // 当前章节位置 传递给book.section可以获得章节信息 然后渲染sectionInfo.href
     cover: '', // 电子书封面
     metadata: null,
-    navigation: null // 一维目录
+    navigation: null, // 一维目录
+    offsetY: 0, // 书签下拉距离
+    isBookmark: null, // 当前页是否为书签页
+    pagelist: null, // 分页结果
+    paginate: 0 // 当前页 比较粗略
   },
   mutations: {
     'SET_FILENAME': (state, fileName) => {
@@ -57,7 +61,20 @@ const book = {
     },
     'SET_NAVIGATION': (state, navigation) => {
       state.navigation = navigation
+    },
+    'SET_OFFSETY': (state, offsetY) => {
+      state.offsetY = offsetY
+    },
+    'SET_ISBOOKMARK': (state, isBookmark) => {
+      state.isBookmark = isBookmark
+    },
+    'SET_PAGELIST': (state, pagelist) => {
+      state.pagelist = pagelist
+    },
+    'SET_PAGINATE': (state, paginate) => {
+      state.paginate = paginate
     }
+
   }
   // actions移动到 actionis.js进行独立的管理
   // actions: {

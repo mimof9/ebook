@@ -65,7 +65,7 @@
     position: absolute;
     left: 0;
     bottom: 0;
-    z-index: 103;
+    z-index: 203;
     width: 100%;  /*不设置height 高度自适应*/
     background: white;
     box-shadow: 0 px2rem(-4) px2rem(6) rgba(0, 0, 0, .1);
